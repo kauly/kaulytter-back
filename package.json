@@ -18,6 +18,7 @@
     "nodemon": "^1.18.10"
   },
   "scripts": {
+    "start": "node app/app.js",
     "dev": "nodemon app/app.js"
   }
 }
