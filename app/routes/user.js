@@ -8,5 +8,6 @@ router.post("/find", action.find);
 router.post("/update", action.update);
 router.get("/findall", action.findAll);
 router.post("/addtwitter", action.addTwitter);
+router.post("/upload", action.upload);
 
 module.exports = router;

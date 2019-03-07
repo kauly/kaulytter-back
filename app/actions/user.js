@@ -1,3 +1,4 @@
+const cloud = require("cloudinary");
 const User = require("../models/user");
 const Handler = require("./handlers");
 
@@ -55,10 +56,25 @@ async function addTwitter(req, res) {
   }
 }
 
+async function upload(req, res) {
+  if (Object.keys(req.files).length == 0) {
+    return res.status(400).send("No files were uploaded.");
+  }
+  let sampleFile = req.files.img;
+  sampleFile.mv("./tmp/filename.jpg", async function(err) {
+    if (err) return res.status(500).send(err);
+    await cloud.uploader.upload("./tmp/filename.jpg", result =>
+      console.log(result)
+    );
+    res.send("File uploaded!");
+  });
+}
+
 module.exports = {
   add,
   update,
   find,
   findAll,
-  addTwitter
+  addTwitter,
+  upload
 };
