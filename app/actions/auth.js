@@ -34,6 +34,32 @@ async function signup(req, res, next) {
   }
 }
 
+function verifyToken(req, res, next) {
+  let token = "";
+  try {
+    token = req.headers.authorization.split(" ")[1];
+  } catch (err) {
+    return res
+      .status(403)
+      .send({ auth: false, message: "Nem um token encontrado." });
+  }
+  jwt.verify(token, process.env.SECRET, function(err, decoded) {
+    if (err) {
+      if (err.name === "TokenExpiredError") {
+        return res
+          .status(401)
+          .send({ auth: false, message: "O Token expirou." });
+      } else if (err.name === "JsonWebTokenError") {
+        return res
+          .status(403)
+          .send({ auth: false, message: "Token inválido." });
+      }
+    }
+    req.userId = decoded.id;
+    next();
+  });
+}
+
 module.exports = {
   sign,
   signup
