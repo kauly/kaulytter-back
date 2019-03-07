@@ -55,12 +55,12 @@ function verifyToken(req, res, next) {
           .send({ auth: false, message: "Token inválido." });
       }
     }
-    req.userId = decoded.id;
     next();
   });
 }
 
 module.exports = {
   sign,
-  signup
+  signup,
+  verifyToken
 };
