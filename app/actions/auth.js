@@ -4,14 +4,17 @@ const Handler = require("./handlers");
 
 async function sign(req, res) {
   const { name, password } = req.body;
+  let validate = false;
   try {
     const user = await User.findOne({ name });
-    if (!user || !user.isValidPassword(password)) {
-      throw "Usuário ou senha inválidos.";
+    user && (validate = await user.isValidPassword(password));
+    if (!user || !validate) {
+      return Handler.errorHandler(res, "Usuário ou senha inválidos.", 400);
     }
     const token = jwt.sign({ name }, process.env.SECRET);
-    return Handler.successHandler(res, { user, token });
+    return Handler.successHandler(res, { userName: user.name, token });
   } catch (err) {
+    console.log(err);
     return Handler.errorHandler(res, err, 500);
   }
 }
@@ -28,7 +31,7 @@ async function signup(req, res, next) {
       );
     const newUser = await User.create({ ...req.body });
     const token = jwt.sign({ name }, process.env.SECRET);
-    return Handler.successHandler(res, { token, user: newUser });
+    return Handler.successHandler(res, { token, userName: newUser.name });
   } catch (err) {
     return Handler.errorHandler(res, "Erro ao criar usuário.", 500);
   }

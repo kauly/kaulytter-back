@@ -9,6 +9,8 @@ const routes = require("./routes/index");
 require("dotenv").config();
 
 const app = express();
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
 
 //THIRD
 mongoose.connect(process.env.DB_URI, { useNewUrlParser: true });
@@ -21,7 +23,12 @@ cloud.config({
 //MIDDLEWARES
 app.use(cors());
 app.use(logger("dev"));
-app.use(fileUpload());
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/"
+  })
+);
 app.use(bodyParser.urlencoded({ limit: "150mb", extended: true }));
 app.use(bodyParser.json({ limit: "150mb", extended: true }));
 
@@ -29,7 +36,11 @@ app.use(bodyParser.json({ limit: "150mb", extended: true }));
 app.use("/api", routes);
 
 const port = process.env.PORT || 3003;
-
-app.listen(port, function() {
+io.on("connection", function(socket) {
+  console.log("a user connected");
+});
+http.listen(port, function() {
   console.log(`Server is running at port ${port}.`);
 });
+
+module.exports.io = io;
